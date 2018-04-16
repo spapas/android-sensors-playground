@@ -1,2 +1,2 @@
 # android-sensors-playground
-A playground fro android sensors
+A playground for android sensors
