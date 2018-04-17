@@ -10,6 +10,7 @@ import android.os.CpuUsageInfo;
 import android.os.HardwarePropertiesManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -21,7 +22,10 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private final static String TAG = "MainActivity";
@@ -32,6 +36,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void getAllSensors() {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         allSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+    }
+
+    private static String getStringDate(long timestamp) {
+        Calendar cal = Calendar.getInstance(Locale.US);
+        long timeInMillis = (new Date()).getTime() + (timestamp - System.nanoTime()) / 1000000L;
+        cal.setTimeInMillis(timeInMillis);
+
+        String date = DateFormat.format("yyyy-MM-dd hh:mm:ss", cal).toString();
+        return date;
     }
 
     public static JSONObject sensorToJson(Sensor s) throws JSONException {
@@ -77,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             jo.put("accuracy", Integer.toString(se.accuracy));
             jo.put("accuracy_text", getAccuracyText(se.accuracy));
             jo.put("timestamp", se.timestamp);
+            jo.put("text_timestamp", getStringDate(se.timestamp ));
 
             JSONArray vj = new JSONArray();
             for(int i=0;i<se.values.length;i++) {
@@ -116,12 +130,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     TextView helloTV;
+    TextView lightSensorTV;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         helloTV = findViewById(R.id.helloTV);
+        lightSensorTV = findViewById(R.id.lightSensorTV);
 
         JSONObject loadAvg = getLoadAvg();
         //String allSensors = getAllSensors(getApplicationContext());
@@ -148,8 +164,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
+    public void onSensorChanged(final SensorEvent sensorEvent) {
         Log.d(TAG, "SENSOR EVENT " + sensorEventToJson(sensorEvent));
+        if(sensorEvent.sensor.getType() == Sensor.TYPE_LIGHT) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    lightSensorTV.setText(sensorEventToJson(sensorEvent).toString());
+                }
+            });
+        }
+
     }
 
     @Override
