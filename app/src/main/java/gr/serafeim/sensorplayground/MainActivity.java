@@ -1,6 +1,7 @@
 package gr.serafeim.sensorplayground;
 
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,6 +14,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -23,6 +30,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +38,11 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private final static String TAG = "MainActivity";
+
+    TextView loadAvgTV;
+    TextView sensorTV;
+    TextView sensorEventTV;
+    Spinner sensorsSpinner;
 
     private SensorManager mSensorManager;
     private List<Sensor> allSensors;
@@ -48,26 +61,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return date;
     }
 
-    public static JSONObject sensorToJson(Sensor s) throws JSONException {
+    public static JSONObject sensorToJson(Sensor s) {
         JSONObject jo = new JSONObject();
-        jo.put("name", s.getName());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            jo.put("id", Integer.toString(s.getId()));
-        }
-        jo.put("power", s.getPower());
-        jo.put("resolution", s.getResolution());
-        jo.put("max_delay", s.getMaxDelay());
-        jo.put("type", s.getType());
-        jo.put("string_type", s.getStringType());
-        jo.put("vendor", s.getVendor());
-        jo.put("fifo_max_event_cound", s.getFifoMaxEventCount());
-        jo.put("fifo_reserved_event_cound", s.getFifoReservedEventCount());
-        jo.put("max_range", s.getMaximumRange());
-        jo.put("min_delay", s.getMinDelay());
-        jo.put("version", s.getVersion());
-        jo.put("reporting_mode", s.getReportingMode());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            jo.put("highest_direct_report_rate_level", s.getHighestDirectReportRateLevel());
+        try {
+            jo.put("name", s.getName());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                jo.put("id", Integer.toString(s.getId()));
+            }
+            jo.put("power", s.getPower());
+            jo.put("resolution", s.getResolution());
+            jo.put("max_delay", s.getMaxDelay());
+            jo.put("type", s.getType());
+            jo.put("string_type", s.getStringType());
+            jo.put("vendor", s.getVendor());
+            jo.put("fifo_max_event_cound", s.getFifoMaxEventCount());
+            jo.put("fifo_reserved_event_cound", s.getFifoReservedEventCount());
+            jo.put("max_range", s.getMaximumRange());
+            jo.put("min_delay", s.getMinDelay());
+            jo.put("version", s.getVersion());
+            jo.put("reporting_mode", s.getReportingMode());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                jo.put("highest_direct_report_rate_level", s.getHighestDirectReportRateLevel());
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
         return jo;
@@ -130,9 +148,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return null;
     }
 
-    TextView loadAvgTV;
-    TextView lightSensorTV;
-    TextView accelerrometerTV;
 
 
     Runnable getLoadAvgRunnable = new Runnable() {
@@ -156,15 +171,41 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
 
         loadAvgTV = findViewById(R.id.loadAvgTV);
-        lightSensorTV = findViewById(R.id.lightSensorTV);
-        accelerrometerTV = findViewById(R.id.accelerrometerTV);
+        sensorTV = findViewById(R.id.sensorTV);
+        sensorEventTV = findViewById(R.id.sensorEventTV);
+        sensorsSpinner  = findViewById(R.id.sensorsSpinner);
 
         JSONObject loadAvg = getLoadAvg();
         //String allSensors = getAllSensors(getApplicationContext());
         loadAvgTV.setText(loadAvg.toString());
+        getAllSensors();
 
+        ArrayList<String> spinnerArray = new ArrayList<>();
+        for(Sensor s: allSensors) {
+            spinnerArray.add(s.getName());
+        }
 
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerArray); //selected item will look like a spinner set from XML
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sensorsSpinner.setAdapter(spinnerArrayAdapter);
         getLoadAvgHandler.postDelayed(getLoadAvgRunnable , 1000);
+        sensorsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String item = (String)adapterView.getItemAtPosition(i);
+                for(Sensor s: allSensors) {
+                    if(s.getName().equals(item)) {
+                        sensorTV.setText(sensorToJson(s).toString());
+                    }
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -187,18 +228,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(final SensorEvent sensorEvent) {
         //Log.d(TAG, "SENSOR EVENT " + sensorEventToJson(sensorEvent));
-        if(sensorEvent.sensor.getType() == Sensor.TYPE_LIGHT) {
+        if(sensorEvent.sensor.getName().equals(sensorsSpinner.getSelectedItem().toString())) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    lightSensorTV.setText(sensorEventToJson(sensorEvent).toString());
-                }
-            });
-        } else if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    accelerrometerTV.setText(sensorEventToJson(sensorEvent).toString());
+                    JSONObject jo = sensorEventToJson(sensorEvent);
+                    jo.remove("sensor");
+                    sensorEventTV.setText(jo.toString());
                 }
             });
         }
@@ -207,17 +243,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
-        try {
-            Log.d(TAG, "ACCURACY CHANGED " + sensorToJson(sensor).toString() + "L " + getAccuracyText(i));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Log.d(TAG, "ACCURACY CHANGED " + sensorToJson(sensor).toString() + "L " + getAccuracyText(i));
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getAllSensors();
+        //getAllSensors();
         for(Sensor s: allSensors) {
             mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
         }
