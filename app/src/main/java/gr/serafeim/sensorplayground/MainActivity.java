@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,6 +32,61 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void getAllSensors() {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         allSensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+    }
+
+    public static JSONObject sensorToJson(Sensor s) throws JSONException {
+        JSONObject jo = new JSONObject();
+        jo.put("name", s.getName());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            jo.put("id", Integer.toString(s.getId()));
+        }
+        jo.put("power", s.getPower());
+        jo.put("resolution", s.getResolution());
+        jo.put("max_delay", s.getMaxDelay());
+        jo.put("type", s.getType());
+        jo.put("string_type", s.getStringType());
+        jo.put("vendor", s.getVendor());
+        jo.put("fifo_max_event_cound", s.getFifoMaxEventCount());
+        jo.put("fifo_reserved_event_cound", s.getFifoReservedEventCount());
+        jo.put("max_range", s.getMaximumRange());
+        jo.put("min_delay", s.getMinDelay());
+        jo.put("version", s.getVersion());
+        jo.put("reporting_mode", s.getReportingMode());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            jo.put("highest_direct_report_rate_level", s.getHighestDirectReportRateLevel());
+        }
+
+        return jo;
+    }
+
+    public static String getAccuracyText(int ac) {
+        switch(ac) {
+            case SensorManager.SENSOR_STATUS_ACCURACY_HIGH: return "SENSOR_STATUS_ACCURACY_HIGH";
+            case SensorManager.SENSOR_STATUS_ACCURACY_LOW: return "ACCURACY_LOW";
+            case SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM: return "ACCURACY_MEDIUM";
+            case SensorManager.SENSOR_STATUS_NO_CONTACT: return "NO_CONTACT";
+            case SensorManager.SENSOR_STATUS_UNRELIABLE: return "UNRELIABLE";
+            default: return "ERROR";
+        }
+    }
+
+    public static JSONObject sensorEventToJson(SensorEvent se) {
+        JSONObject jo = new JSONObject();
+        try {
+            jo.put("sensor", sensorToJson(se.sensor));
+            jo.put("accuracy", Integer.toString(se.accuracy));
+            jo.put("accuracy_text", getAccuracyText(se.accuracy));
+            jo.put("timestamp", se.timestamp);
+
+            JSONArray vj = new JSONArray();
+            for(int i=0;i<se.values.length;i++) {
+                vj.put(se.values[i]);
+            }
+            jo.put("values", vj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jo;
     }
 
     public static JSONObject getLoadAvg() {
@@ -93,12 +149,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        Log.d(TAG, "SENSOR CHANGED " + sensorEvent);
+        Log.d(TAG, "SENSOR EVENT " + sensorEventToJson(sensorEvent));
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
-        Log.d(TAG, "ACCURACY CHANGED " + sensor + " " + i);
+        try {
+            Log.d(TAG, "ACCURACY CHANGED " + sensorToJson(sensor).toString() + "L " + getAccuracyText(i));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
