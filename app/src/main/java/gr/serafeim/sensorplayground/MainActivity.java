@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.CpuUsageInfo;
+import android.os.Handler;
 import android.os.HardwarePropertiesManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -132,6 +133,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     TextView helloTV;
     TextView lightSensorTV;
     TextView accelerrometerTV;
+
+
+    Runnable getLoadAvgRunnable = new Runnable() {
+        public void run() {
+            final JSONObject loadAvg = getLoadAvg();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    helloTV.setText(loadAvg.toString());
+                }
+            });
+            getLoadAvgHandler.postDelayed(getLoadAvgRunnable , 100);
+        }
+    };
+    Handler getLoadAvgHandler = new Handler();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         helloTV.setText(loadAvg.toString());
 
 
+        getLoadAvgHandler.postDelayed(getLoadAvgRunnable , 1000);
 
         /*
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -167,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(final SensorEvent sensorEvent) {
-        Log.d(TAG, "SENSOR EVENT " + sensorEventToJson(sensorEvent));
+        //Log.d(TAG, "SENSOR EVENT " + sensorEventToJson(sensorEvent));
         if(sensorEvent.sensor.getType() == Sensor.TYPE_LIGHT) {
             runOnUiThread(new Runnable() {
                 @Override
