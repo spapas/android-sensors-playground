@@ -22,6 +22,12 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +49,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     TextView sensorTV;
     TextView sensorEventTV;
     Spinner sensorsSpinner;
+    LineChart chart;
+    LineDataSet chartDataSet;
+    LineData lineData;
+    int chartX = 0;
 
     private SensorManager mSensorManager;
     private List<Sensor> allSensors;
@@ -148,8 +158,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return null;
     }
 
-
-
     Runnable getLoadAvgRunnable = new Runnable() {
         public void run() {
             final JSONObject loadAvg = getLoadAvg();
@@ -174,6 +182,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorTV = findViewById(R.id.sensorTV);
         sensorEventTV = findViewById(R.id.sensorEventTV);
         sensorsSpinner  = findViewById(R.id.sensorsSpinner);
+        chart  = findViewById(R.id.chart);
+
+        XAxis xAxis = chart.getXAxis();
+
+        xAxis.setTextSize(10f);
+
+        xAxis.setDrawAxisLine(false);
+        xAxis.setDrawGridLines(false);
+        xAxis.setAxisMinimum(0);
+        xAxis.setAxisMaximum(1000);
+
+        ArrayList<Entry> entries = new ArrayList<Entry>();
+        entries.add(new Entry(++chartX, 0));
+        chartDataSet = new LineDataSet(entries, "Label");
+
+
+        lineData = new LineData(chartDataSet );
+
+        chart.setData(lineData);
+        chart.setAutoScaleMinMaxEnabled(true);
+        chart.setDrawGridBackground(false);
+        chart.invalidate(); // refresh
 
         JSONObject loadAvg = getLoadAvg();
         //String allSensors = getAllSensors(getApplicationContext());
@@ -198,6 +228,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         sensorTV.setText(sensorToJson(s).toString());
                     }
                 }
+                ArrayList<Entry> entries = new ArrayList<Entry>();
+                chartX = 0;
+                entries.add(new Entry(++chartX, 0));
+                lineData.removeDataSet(0);
+                chartDataSet = new LineDataSet(entries, "Label");
+                lineData.addDataSet( chartDataSet);
+                lineData.notifyDataChanged(); // let the data know a dataSet changed
+                chart.notifyDataSetChanged(); // let the chart know it's data changed
+                chart.invalidate();
 
             }
 
@@ -235,6 +274,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     JSONObject jo = sensorEventToJson(sensorEvent);
                     jo.remove("sensor");
                     sensorEventTV.setText(jo.toString());
+                    chartDataSet.addEntry(new Entry(++chartX, sensorEvent.values[0]));
+                    chart.notifyDataSetChanged();
+                    chart.invalidate();
+
+                    if(chartX > 1000) {
+                        ArrayList<Entry> entries = new ArrayList<Entry>();
+                        chartX = 0;
+                        entries.add(new Entry(++chartX, 0));
+                        lineData.removeDataSet(0);
+                        chartDataSet = new LineDataSet(entries, "Label");
+                        lineData.addDataSet( chartDataSet);
+                        lineData.notifyDataChanged(); // let the data know a dataSet changed
+                        chart.notifyDataSetChanged(); // let the chart know it's data changed
+                        chart.invalidate();
+                    }
                 }
             });
         }
