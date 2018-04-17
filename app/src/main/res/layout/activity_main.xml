@@ -11,10 +11,10 @@
         android:id="@+id/loadAvgTV"
         android:layout_width="60dp"
         android:layout_height="19dp"
-        android:layout_marginBottom="408dp"
+        android:layout_marginBottom="488dp"
         android:text="Load avg:"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.111"
+        app:layout_constraintHorizontal_bias="0.003"
         app:layout_constraintLeft_toLeftOf="parent"
 
         app:layout_constraintRight_toRightOf="parent" />
@@ -26,11 +26,11 @@
         android:maxLines="4"
         android:text="1 2 3"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.135"
+        app:layout_constraintHorizontal_bias="0.045"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loadAvgTV"
-        app:layout_constraintVertical_bias="0.087" />
+        app:layout_constraintVertical_bias="0.014" />
 
     <TextView
         android:id="@+id/lightSensorTV"
@@ -40,13 +40,29 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
-        android:text="TextView"
+        android:text="lightSensorTV"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/helloTV"
-        app:layout_constraintVertical_bias="0.35000002" />
+        app:layout_constraintVertical_bias="0.0" />
 
+    <TextView
+        android:id="@+id/accelerrometerTV"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="accelerrometerTV"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lightSensorTV"
+        app:layout_constraintVertical_bias="0.0" />
 
 
 </android.support.constraint.ConstraintLayout>

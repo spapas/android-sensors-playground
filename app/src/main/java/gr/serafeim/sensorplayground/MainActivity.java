@@ -131,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     TextView helloTV;
     TextView lightSensorTV;
+    TextView accelerrometerTV;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         helloTV = findViewById(R.id.helloTV);
         lightSensorTV = findViewById(R.id.lightSensorTV);
+        accelerrometerTV = findViewById(R.id.accelerrometerTV);
 
         JSONObject loadAvg = getLoadAvg();
         //String allSensors = getAllSensors(getApplicationContext());
@@ -171,6 +173,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 @Override
                 public void run() {
                     lightSensorTV.setText(sensorEventToJson(sensorEvent).toString());
+                }
+            });
+        } else if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    accelerrometerTV.setText(sensorEventToJson(sensorEvent).toString());
                 }
             });
         }
