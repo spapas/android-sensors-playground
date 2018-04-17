@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return null;
     }
 
-    TextView helloTV;
+    TextView loadAvgTV;
     TextView lightSensorTV;
     TextView accelerrometerTV;
 
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    helloTV.setText(loadAvg.toString());
+                    loadAvgTV.setText(loadAvg.toString());
                 }
             });
             getLoadAvgHandler.postDelayed(getLoadAvgRunnable , 100);
@@ -155,13 +155,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        helloTV = findViewById(R.id.helloTV);
+        loadAvgTV = findViewById(R.id.loadAvgTV);
         lightSensorTV = findViewById(R.id.lightSensorTV);
         accelerrometerTV = findViewById(R.id.accelerrometerTV);
 
         JSONObject loadAvg = getLoadAvg();
         //String allSensors = getAllSensors(getApplicationContext());
-        helloTV.setText(loadAvg.toString());
+        loadAvgTV.setText(loadAvg.toString());
 
 
         getLoadAvgHandler.postDelayed(getLoadAvgRunnable , 1000);
