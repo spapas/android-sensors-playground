@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         ArrayList<Entry> entries = new ArrayList<Entry>();
         entries.add(new Entry(++chartX, 0));
-        chartDataSet = new LineDataSet(entries, "Label");
+        chartDataSet = new LineDataSet(entries, "");
 
 
         lineData = new LineData(chartDataSet );
@@ -203,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         chart.setData(lineData);
         chart.setAutoScaleMinMaxEnabled(true);
         chart.setDrawGridBackground(false);
+        chart.setContentDescription("");
         chart.invalidate(); // refresh
 
         JSONObject loadAvg = getLoadAvg();
@@ -232,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 chartX = 0;
                 entries.add(new Entry(++chartX, 0));
                 lineData.removeDataSet(0);
-                chartDataSet = new LineDataSet(entries, "Label");
+                chartDataSet = new LineDataSet(entries, "");
                 lineData.addDataSet( chartDataSet);
                 lineData.notifyDataChanged(); // let the data know a dataSet changed
                 chart.notifyDataSetChanged(); // let the chart know it's data changed
