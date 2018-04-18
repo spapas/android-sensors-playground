@@ -267,7 +267,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(final SensorEvent sensorEvent) {
-        //Log.d(TAG, "SENSOR EVENT " + sensorEventToJson(sensorEvent));
+        mSensorManager.unregisterListener(this);
+        for(Sensor s: allSensors) {
+            if(s.getName().equals(sensorsSpinner.getSelectedItem().toString())) {
+                mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
+            }
+        }
+
         if(sensorEvent.sensor.getName().equals(sensorsSpinner.getSelectedItem().toString())) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -307,7 +313,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
         //getAllSensors();
         for(Sensor s: allSensors) {
-            mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
+            if(s.getName().equals(sensorsSpinner.getSelectedItem().toString())) {
+                mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_NORMAL);
+            }
         }
     }
 
