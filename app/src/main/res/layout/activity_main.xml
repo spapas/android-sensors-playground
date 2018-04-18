@@ -34,6 +34,7 @@
 
     <Spinner
         android:id="@+id/sensorsSpinner"
+        style="@android:style/Widget.Holo.Light.Spinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -41,9 +42,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/loadAvgTV"
-        style="@android:style/Widget.Holo.Light.Spinner"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/loadAvgTV" />
 
     <TextView
         android:id="@+id/sensorEventTV"
