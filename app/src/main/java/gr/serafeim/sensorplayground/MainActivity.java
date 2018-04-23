@@ -247,22 +247,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-        /*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            HardwarePropertiesManager hardwarePropertiesManager = getApplicationContext().getSystemService(HardwarePropertiesManager.class);
-            CpuUsageInfo[] cpuUsages = hardwarePropertiesManager.getCpuUsages();
-            float[] fanSpeeds = hardwarePropertiesManager.getFanSpeeds();
-            float[] cpuTemperatures = hardwarePropertiesManager.getDeviceTemperatures(HardwarePropertiesManager.DEVICE_TEMPERATURE_CPU, HardwarePropertiesManager.TEMPERATURE_CURRENT);
-            float[] gpuTemperatures = hardwarePropertiesManager.getDeviceTemperatures(HardwarePropertiesManager.DEVICE_TEMPERATURE_GPU, HardwarePropertiesManager.TEMPERATURE_CURRENT);
-            float[] batteryTemperatures = hardwarePropertiesManager.getDeviceTemperatures(HardwarePropertiesManager.DEVICE_TEMPERATURE_BATTERY, HardwarePropertiesManager.TEMPERATURE_CURRENT);
-            float[] skinTemperatures = hardwarePropertiesManager.getDeviceTemperatures(HardwarePropertiesManager.DEVICE_TEMPERATURE_SKIN, HardwarePropertiesManager.TEMPERATURE_CURRENT);
-            helloTV.setText("FS " + fanSpeeds[0] + "CPU " + cpuTemperatures[0]);
-        } else {
-            helloTV.setText("Not supported");
-        }
-        */
-
-
     }
 
     @Override
